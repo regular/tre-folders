@@ -123,6 +123,25 @@ module.exports = function (ssb, opts) {
   }
 }
 
+module.exports.factory = factory
+  
+function factory() {
+  const type = 'folder'
+  return {
+    type,
+    i18n: {
+      'en': 'Folder'
+    },
+    content: function() {
+      return {
+        type
+      }
+    }
+  }
+}
+
+// -- utils
+
 // -- utils
 
 function revisionRoot(kv) {
