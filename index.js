@@ -142,8 +142,6 @@ function factory() {
 
 // -- utils
 
-// -- utils
-
 function revisionRoot(kv) {
   return kv.value.content && kv.value.content.revisionRoot || kv.key
 }
