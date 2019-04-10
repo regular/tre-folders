@@ -96,7 +96,6 @@ module.exports = function (ssb, opts) {
       return function(list, ctx) {
         return h('ul', MutantMap(list, m => {
           const item = opts.renderItem(m(), ctx)
-          console.log('item', item)
           return h('li', item) 
         }, (a, b) => a===b ))
       }
