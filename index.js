@@ -13,6 +13,7 @@ function renderName(kv, ctx) {
 }
 
 function renderDefaultTileContent(kv, ctx) {
+  if (!kv) return []
   const c = kv.value && kv.value.content
   const {type} = c
   return h('div', {
@@ -71,6 +72,7 @@ module.exports = function (ssb, opts) {
   }
 
   function renderTile(kv, ctx) {
+    if (!kv) return []
     return h('.tile', {
     }, 
     [renderTileContent(kv, Object.assign({}, ctx, {
@@ -81,6 +83,7 @@ module.exports = function (ssb, opts) {
   }
 
   return function renderFolder(kv, ctx) {
+    if (!kv) return []
     const content = kv.value && kv.value.content
     if (content.type !== 'folder') return
     if (ctx.where !== 'editor') return
@@ -95,9 +98,13 @@ module.exports = function (ssb, opts) {
     function DefaultRenderList(opts) {
       return function(list, ctx) {
         return h('ul', MutantMap(list, m => {
+          if (!m) return []
           const item = opts.renderItem(m(), ctx)
           return h('li', item) 
-        }, (a, b) => a===b ))
+        }, {
+          comparer: (a, b) => a===b,
+          maxTime: 200
+        } ))
       }
     }
 
