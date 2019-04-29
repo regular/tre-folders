@@ -103,7 +103,7 @@ module.exports = function (ssb, opts) {
           return h('li', item) 
         }, {
           comparer: (a, b) => a===b,
-          maxTime: 200
+          maxTime: opts.maxTime
         } ))
       }
     }
