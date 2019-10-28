@@ -26,46 +26,7 @@ function renderDefaultTileContent(kv, ctx) {
 module.exports = function (ssb, opts) {
   const renderTileContent = opts.renderTile || renderDefaultTileContent
 
-  setStyle(`
-    .tre-folders > ul {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, 72px);
-      grid-template-rows: repeat(auto-fill, 72px);
-      grid-auto-flow: row;
-      padding: 6px;
-      grid-gap: 6px;
-      place-items: stretch;
-      place-content: start;
-    }
-    .tre-folders > ul > li {
-      list-style-type: none;
-    }
-    .tre-folders .tile {
-      width: 100%;
-      height: 100%;
-      padding: 0;
-      display: grid;
-      grid-template-rows: 18px 1fr 28px;
-      grid-template-columns: 100%;
-      overflow: hidden;
-      place-items: stretch;
-      place-content: stretch;
-    }
-    .tre-folders .tile > :first-child {
-      grid-row: 1 / 3;
-      margin: auto;
-    }
-    .tre-folders .tile > .name {
-      place-self: center;
-      margin: auto;
-      height: 100%;
-      grid-row: 3 / 4;
-      display: inline;
-      width: 100%;
-      word-wrap: break-word;
-      text-align: center;
-    }
-  `)
+  _setStyle()
 
   function branches(kv) {
     return ssb.revisions.messagesByBranch(revisionRoot(kv), {live: true, sync: true})
@@ -74,6 +35,9 @@ module.exports = function (ssb, opts) {
   function renderTile(kv, ctx) {
     if (!kv) return []
     return h('.tile', {
+      'ev-dblclick': ev => {
+        ctx.primarySelection.set(kv)
+      }
     }, 
     [renderTileContent(kv, Object.assign({}, ctx, {
       where: 'tile'
@@ -152,3 +116,45 @@ function revisionRoot(kv) {
   return kv.value.content && kv.value.content.revisionRoot || kv.key
 }
 
+function _setStyle() {
+  setStyle(`
+    .tre-folders > ul {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 72px);
+      grid-auto-rows: 72px;
+      grid-auto-flow: row;
+      padding: 6px;
+      grid-gap: 6px;
+      place-items: stretch;
+      place-content: start;
+    }
+    .tre-folders > ul > li {
+      list-style-type: none;
+    }
+    .tre-folders .tile {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      display: grid;
+      grid-template-rows: 18px 1fr 28px;
+      grid-template-columns: 100%;
+      overflow: hidden;
+      place-items: stretch;
+      place-content: stretch;
+    }
+    .tre-folders .tile > :first-child {
+      grid-row: 1 / 3;
+      margin: auto;
+    }
+    .tre-folders .tile > .name {
+      place-self: center;
+      margin: auto;
+      height: 100%;
+      grid-row: 3 / 4;
+      display: inline;
+      width: 100%;
+      word-wrap: break-word;
+      text-align: center;
+    }
+  `)
+}
