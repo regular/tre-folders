@@ -34,16 +34,42 @@ module.exports = function (ssb, opts) {
 
   function renderTile(kv, ctx) {
     if (!kv) return []
+    const primarySelection = ctx.primarySelection || Value()
+    const secondarySelections = ctx.secondarySelections || Value([])
+    function selected() {
+      const sels = secondarySelections()
+      return sels.find(sel=>revisionRoot(sel) == revisionRoot(kv))
+    }
     return h('.tile', {
+      classList: computed(secondarySelections, sels =>{
+        return selected() ? ['selected'] : []
+      }),
       'ev-dblclick': ev => {
-        ctx.primarySelection.set(kv)
+        primarySelection.set(kv)
+      },
+      'ev-click': ev => {
+        const l = secondarySelections().length
+        if (l == 1 && revisionRoot(secondarySelections()[0]) == revisionRoot(kv)) {
+          return secondarySelections.set([])
+        }
+        if (ev.ctrlKey) {
+          if (selected()) {
+            secondarySelections.set(secondarySelections().filter(sel=>revisionRoot(sel) !== revisionRoot(kv)))
+          } else {
+            secondarySelections.set(secondarySelections().concat([kv]))
+          }
+          return
+        }
+        secondarySelections.set([kv])
       }
-    }, 
-    [renderTileContent(kv, Object.assign({}, ctx, {
-      where: 'tile'
-    }))].concat([
-      renderName(kv)
-    ]))
+    },
+    [h('.background')].concat(
+      [renderTileContent(kv, Object.assign({}, ctx, {
+        where: 'tile'
+      }))].concat([
+        renderName(kv)
+      ]))
+    )
   }
 
   return function renderFolder(kv, ctx) {
@@ -142,7 +168,21 @@ function _setStyle() {
       place-items: stretch;
       place-content: stretch;
     }
-    .tre-folders .tile > :first-child {
+    .tre-folders .tile.selected {
+      box-shadow: 0 0 5px var(--tre-secondary-selection-color)
+    }
+    .tre-folders .tile > .background {
+      height: 100%;
+      width: 100%;
+      grid-column: 1 / 2;
+      grid-row: 1 / 4;
+      background-color: transparent;
+    }
+    .tre-folders .tile.selected > .background {
+      background-color: var(--tre-secondary-selection-color);
+    }
+    .tre-folders .tile > :nth-child(2) {
+      grid-column: 1 / 2;
       grid-row: 1 / 3;
       margin: auto;
     }
@@ -150,6 +190,7 @@ function _setStyle() {
       place-self: center;
       margin: auto;
       height: 100%;
+      grid-column: 1 / 2;
       grid-row: 3 / 4;
       display: inline;
       width: 100%;
